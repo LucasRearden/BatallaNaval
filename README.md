@@ -4,7 +4,7 @@ A multi-user Battleship game where a human player battles a computer opponent dr
 
 Built with **Java 21** and **Spring Boot**, following an **MVP (Passive View)** architecture and classic object-oriented design patterns.
 
-🔗 **Live demo:** [batallanaval.onrender.com](https://batallanaval.onrender.com) <!-- replace with your Render URL -->
+🔗 **Live demo:** https://batallanaval-fjgv.onrender.com/
 
 > Hosted on Render's free tier: if the app has been idle for 15 minutes, the first request takes about a minute to wake it up.
 
@@ -116,14 +116,3 @@ docker build -t battleship .
 docker run -p 8080:8080 battleship
 ```
 
----
-
-## Acknowledgments
-
-- Developed as an academic project for the Application Design course at Universidad ORT Uruguay (2026).
-- `CommandDispatcher.js`, `BattleShipBoard.js` and the base command, observer and SSE connection classes were provided by the course and are used unmodified.
-- Developed with the assistance of generative AI (Claude) for code generation and debugging.
-
-## Author
-
-**Your Name** — [GitHub](https://github.com/LucasRearden) · [LinkedIn](https://www.linkedin.com/in/your-profile) <!-- complete -->
