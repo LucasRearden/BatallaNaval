@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparar una nueva batalla</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <main>
+        <h1>Preparar una nueva batalla</h1>
+        <p id="mensaje" class="mensaje"></p>
+
+        <form id="formulario" class="formulario">
+            <fieldset>
+                <legend>Lugar del combate</legend>
+                <label>Nombre <input type="text" id="lugar"></label>
+                <label>Táctica de juego <select id="tactica"></select></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Océano</legend>
+                <label>Cantidad de celdas horizontales <input type="number" id="celdasHorizontales" value="10"></label>
+                <label>Cantidad de celdas verticales <input type="number" id="celdasVerticales" value="10"></label>
+            </fieldset>
+
+            <fieldset>
+                <legend>Flota</legend>
+                <div id="flota"></div>
+            </fieldset>
+
+            <div class="botones">
+                <button type="submit">Continuar</button>
+                <button type="button" id="btnVolver">Volver a la sala de operaciones</button>
+            </div>
+        </form>
+    </main>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        const mensaje = document.getElementById('mensaje');
+        const flota = document.getElementById('flota');
+
+        dispatcher.mapFunctions({
+            tacticas: (nombres) => {
+                document.getElementById('tactica').innerHTML =
+                    '<option value="-1">Seleccione...</option>' +
+                    nombres.map((n, pos) => `<option value="${pos}">${n}</option>`).join('');
+            },
+            tiposBarco: (tipos) => {
+                flota.innerHTML = tipos.map((t) => `
+                    <label>${t.nombre} (${t.tamanio} celdas)
+                        <input type="number" class="cantidad" value="0">
+                    </label>`).join('');
+            },
+            navegar: (url) => {
+                window.location.href = url;
+            }
+        }, {
+            onError: (status) => { mensaje.textContent = 'Error de servidor: ' + status; },
+            onException: (texto) => { mensaje.textContent = texto; }
+        });
+
+        document.getElementById('formulario').addEventListener('submit', (event) => {
+            event.preventDefault();
+            mensaje.textContent = '';
+            const cantidades = [...document.querySelectorAll('.cantidad')].map((i) => i.value).join(',');
+            dispatcher.submit('/nuevaBatalla/continuar', {
+                lugar: document.getElementById('lugar').value,
+                posTactica: document.getElementById('tactica').value,
+                celdasHorizontales: document.getElementById('celdasHorizontales').value,
+                celdasVerticales: document.getElementById('celdasVerticales').value,
+                cantidades: cantidades
+            });
+        });
+
+        document.getElementById('btnVolver').addEventListener('click', () => {
+            dispatcher.submit('/nuevaBatalla/volver');
+        });
+
+        dispatcher.submit('/nuevaBatalla/vistaConectada', {}, 'GET');
+    </script>
+</body>
+</html>

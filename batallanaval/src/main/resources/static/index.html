@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de operaciones</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <main>
+        <h1>Sala de operaciones</h1>
+
+        <section class="resumen">
+            <div>Total de batallas ganadas: <strong id="ganadas">0</strong></div>
+            <div>Total de batallas perdidas: <strong id="perdidas">0</strong></div>
+            <div>Éxito de la campaña: <strong id="exito">0</strong>%</div>
+        </section>
+
+        <p id="mensaje" class="mensaje"></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Lugar del combate</th>
+                    <th>Océano (ancho x alto)</th>
+                    <th>Estado</th>
+                    <th>Flota propia</th>
+                    <th>Flota enemiga</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cuerpoBatallas"></tbody>
+        </table>
+
+        <button type="button" id="btnNuevaBatalla">Iniciar nueva batalla</button>
+    </main>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        const mensaje = document.getElementById('mensaje');
+        const cuerpoBatallas = document.getElementById('cuerpoBatallas');
+
+        dispatcher.mapFunctions({
+            resumen: (r) => {
+                document.getElementById('ganadas').textContent = r.ganadas;
+                document.getElementById('perdidas').textContent = r.perdidas;
+                document.getElementById('exito').textContent = r.exito;
+            },
+            batallas: (lista) => {
+                cuerpoBatallas.innerHTML = lista.map((b, pos) => `
+                    <tr>
+                        <td>${b.lugar}</td>
+                        <td>${b.dimensiones}</td>
+                        <td>${b.estado}</td>
+                        <td>${b.integridadPropia}</td>
+                        <td>${b.integridadEnemiga}</td>
+                        <td><button type="button" data-pos="${pos}">Entrar</button></td>
+                    </tr>`).join('');
+            },
+            navegar: (url) => {
+                window.location.href = url;
+            }
+        }, {
+            onError: (status) => { mensaje.textContent = 'Error de servidor: ' + status; },
+            onException: (texto) => { mensaje.textContent = texto; }
+        });
+
+        cuerpoBatallas.addEventListener('click', (event) => {
+            const boton = event.target.closest('button[data-pos]');
+            if (!boton) return;
+            dispatcher.submit('/sala/entrar', { posBatalla: boton.dataset.pos });
+        });
+
+        document.getElementById('btnNuevaBatalla').addEventListener('click', () => {
+            dispatcher.submit('/sala/nuevaBatalla');
+        });
+
+        dispatcher.submit('/sala/vistaConectada', {}, 'GET');
+        dispatcher.connectSSE('/sala/registrarSSE');
+    </script>
+</body>
+</html>

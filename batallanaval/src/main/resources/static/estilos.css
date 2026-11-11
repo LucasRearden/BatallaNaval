@@ -1,0 +1,109 @@
+body {
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    background: #eef2f7;
+    color: #1f2937;
+}
+
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.resumen {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 16px;
+}
+
+.mensaje {
+    min-height: 1.4em;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-bottom: 16px;
+}
+
+th, td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #d1d5db;
+    text-align: left;
+}
+
+th {
+    background: #1e3a5f;
+    color: white;
+}
+
+button {
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.leyenda {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #1e3a5f;
+}
+
+.formulario fieldset {
+    background: white;
+    border: 1px solid #d1d5db;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.formulario label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.formulario input[type="number"] {
+    width: 90px;
+}
+
+.botones {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.despliegue {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.despliegue aside {
+    min-width: 200px;
+}
+
+.despliegue aside label {
+    display: block;
+}
+
+.barcos li.seleccionado {
+    font-weight: 700;
+    background: #fde68a;
+}
+
+.estado-ganada {
+    color: #15803d;
+}
+
+.estado-perdida {
+    color: #b91c1c;
+}

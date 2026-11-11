@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desplegando la flota</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <main>
+        <h1>Desplegando la flota</h1>
+        <h2 id="lugar"></h2>
+        <p id="leyenda" class="leyenda"></p>
+        <p id="mensaje" class="mensaje"></p>
+
+        <div class="despliegue">
+            <aside>
+                <h3>Barcos disponibles</h3>
+                <ol id="barcos" class="barcos"></ol>
+
+                <h3>Orientación</h3>
+                <label><input type="radio" name="orientacion" value="horizontal" checked> Horizontal</label>
+                <label><input type="radio" name="orientacion" value="vertical"> Vertical</label>
+            </aside>
+            <div id="tablero"></div>
+        </div>
+
+        <div class="botones">
+            <button type="button" id="btnLibrar">Librar batalla</button>
+            <button type="button" id="btnVolver">Volver a la sala de operaciones</button>
+        </div>
+    </main>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+        import BattleShipBoard from './BattleShipBoard.js';
+
+        const mensaje = document.getElementById('mensaje');
+
+        new BattleShipBoard(document.getElementById('tablero'), dispatcher,
+            { anchoMaximo: 900, altoMaximo: 450, tamanoFuente: 12, tamanoIcono: 22 });
+
+        dispatcher.mapFunctions({
+            lugar: (texto) => {
+                document.getElementById('lugar').textContent = 'Lugar del combate: ' + texto;
+            },
+            orientacion: (valor) => {
+                document.querySelector(`input[name="orientacion"][value="${valor}"]`).checked = true;
+            },
+            barcos: (nombres) => {
+                // el primero de la lista siempre es el seleccionado
+                document.getElementById('barcos').innerHTML = nombres
+                    .map((n, pos) => `<li class="${pos === 0 ? 'seleccionado' : ''}">${n}</li>`).join('');
+            },
+            leyenda: (texto) => {
+                document.getElementById('leyenda').textContent = texto;
+            },
+            navegar: (url) => {
+                window.location.href = url;
+            },
+            batallaIniciada: (url) => {
+                window.location.href = url;
+            }
+        }, {
+            onError: (status) => { mensaje.textContent = 'Error de servidor: ' + status; },
+            onException: (texto) => { mensaje.textContent = texto; }
+        });
+
+        // limpiar el mensaje de error antes de cada acción del usuario
+        document.getElementById('tablero').addEventListener('click', () => { mensaje.textContent = ''; }, true);
+
+        document.querySelectorAll('input[name="orientacion"]').forEach((radio) => {
+            radio.addEventListener('change', () => {
+                dispatcher.submit('/despliegue/orientacion', { valor: radio.value });
+            });
+        });
+
+        document.getElementById('btnLibrar').addEventListener('click', () => {
+            mensaje.textContent = '';
+            dispatcher.submit('/despliegue/librarBatalla');
+        });
+
+        document.getElementById('btnVolver').addEventListener('click', () => {
+            dispatcher.submit("/despliegue/volver");
+        });
+
+        dispatcher.submit('/despliegue/vistaConectada', {}, 'GET');
+        dispatcher.connectSSE('/despliegue/registrarSSE');
+    </script>
+</body>
+</html>

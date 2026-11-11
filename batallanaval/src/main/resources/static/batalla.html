@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librar batalla</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <main>
+        <h1 id="lugar">Batalla</h1>
+        <section class="resumen">
+            <div>Ronda: <strong id="ronda"></strong></div>
+            <div>Estado de la batalla: <strong id="estado"></strong></div>
+        </section>
+        <p id="mensaje" class="mensaje"></p>
+
+        <div id="tablero"></div>
+
+        <div class="botones">
+            <button type="button" id="btnVolver">Volver a la sala de operaciones</button>
+        </div>
+    </main>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+        import BattleShipBoard from './BattleShipBoard.js';
+
+        const mensaje = document.getElementById('mensaje');
+
+        new BattleShipBoard(document.getElementById('tablero'), dispatcher,
+            { anchoMaximo: 1000, altoMaximo: 480, tamanoFuente: 12, tamanoIcono: 22 });
+
+        dispatcher.mapFunctions({
+            lugar: (texto) => {
+                document.getElementById('lugar').textContent = texto;
+            },
+            ronda: (numero) => {
+                document.getElementById('ronda').textContent = numero;
+            },
+            estado: (nombre) => {
+                const estado = document.getElementById('estado');
+                estado.textContent = nombre;
+                estado.className = 'estado-' + nombre.toLowerCase().replace(/\s/g, '-');
+            },
+            navegar: (url) => {
+                window.location.href = url;
+            }
+        }, {
+            onError: (status) => { mensaje.textContent = 'Error de servidor: ' + status; },
+            onException: (texto) => { mensaje.textContent = texto; }
+        });
+
+        // limpiar el mensaje anterior antes de cada click en el tablero
+        document.getElementById('tablero').addEventListener('click', () => { mensaje.textContent = ''; }, true);
+
+        document.getElementById('btnVolver').addEventListener('click', () => {
+            dispatcher.submit('/combate/volver');
+        });
+
+        dispatcher.submit('/combate/vistaConectada', {}, 'GET');
+        dispatcher.connectSSE('/combate/registrarSSE');
+    </script>
+</body>
+</html>
